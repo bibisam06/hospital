@@ -162,8 +162,8 @@ static const short sqlcud0[] =
 
 
 // ? : 2024.11.5
-// win32 Visual C 2010 ?? ?
-// ??  ù ? ? 
+// win32 Visual C 2010 ?????
+// ??? ?????
 #define _CRT_SECURE_NO_WARNINGS
 //-----------------------------------------
 #include <stdio.h>
@@ -178,7 +178,7 @@ static const short sqlcud0[] =
 #include <sqlcpr.h>
 
 
-// win32 Visual C 2010 ?? ?
+// win32 Visual C 2010 ?????
 #define getch() _getch()
 //-----------------------------------------
 
@@ -204,16 +204,16 @@ void main()
 {
     char c = 0;
 
-    _putenv("NLS_LANG=American_America.KO16KSC5601");  //?? ?
+    _putenv("NLS_LANG=American_America.KO16KSC5601");  //?????
 
    /* Register sql_error() as the error handler. */
-    /* EXEC SQL WHENEVER SQLERROR DO sql_error("\7?:"); */ 
+    /* EXEC SQL WHENEVER SQLERROR DO sql_error("\7??"); */ 
 
 
     db_connect();
 
     while( c != '5') {  
-        //  ? 
+        //  ? ?
         clrscr();
 
         print_screen("scr_main.txt") ;
@@ -221,7 +221,7 @@ void main()
 
         
         c = getchar() ;
-        while (getchar() != '\n');  // ù   ? 
+        while (getchar() != '\n');  // ??  ??
 
         switch(c){
             case '1' : select_tuple();
@@ -256,7 +256,7 @@ void main()
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -282,7 +282,7 @@ struct { unsigned short len; unsigned char arr[20]; } pwd;
 
     Error_flag = 0 ;  
 
-   // ?   ?  ?? error ó ? . Error_flag=1 ? 
+   // ??  ?? ???error ??? . Error_flag=1 ??
     /* EXEC SQL CONNECT :uid IDENTIFIED BY :pwd; */ 
 
 {
@@ -328,21 +328,19 @@ struct { unsigned short len; unsigned char arr[20]; } pwd;
     sqlstm.sqlctimeout = (unsigned int )0;
     sqlstm.sqlcnowait = (unsigned int )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
 
-    // connection  ó?
+    // connection ????
     if ( Error_flag ==1 ){
         //printf("Connect error: %s", sqlca.sqlerrm.sqlerrmc);
         exit(-1);
     }
 }
 void reserve_tuple() {
-    /* --------------------------------------------------------------------------
-       ?? ??? ?? ??? ???? ?? ?? ??
-    -------------------------------------------------------------------------- */
+    
     char pt_no[5];               // ?? ??
     char pt_name[17];            // ?? ??
     char pt_birth[11];           // ???? (YYYY-MM-DD)
@@ -353,56 +351,49 @@ void reserve_tuple() {
     char sqlstmt[1000];          // SQL ?? ??? ??
     int error_flag = 0;          // SQL ?? ??? ???? ?? ???
 
-    /* --------------------------------------------------------------------------
-       ?? ??? ? ?? ?? ??
-    -------------------------------------------------------------------------- */
+
+    char res_no[5];
+    char res_pt[17];
+    char res_doc[11];
+    char res_dept[16];
+
+    int x, y;
+
     clrscr();
-    printf("-------------------------------------------------------------------\n");
-    printf("                        ?? ?? ?? ??\n");
-    printf("-------------------------------------------------------------------\n");
+    print_screen("scr_insert.txt");
 
-    /* --------------------------------------------------------------------------
-       ?? ? ?? ?? ??
-    -------------------------------------------------------------------------- */
-    printf("?? ??? ?????: ");
-    fgets(pt_no, sizeof(pt_no), stdin);
-    strtok(pt_no, "\n");  // ??? ?? ?? ?? ?? ??
 
-    printf("?? ??? ?????: ");
-    fgets(pt_name, sizeof(pt_name), stdin);
-    strtok(pt_name, "\n");
+    x = 40;
+    y = 6;
 
-    printf("????? ????? (YYYY-MM-DD): ");
-    fgets(pt_birth, sizeof(pt_birth), stdin);
-    strtok(pt_birth, "\n");
 
-    printf("????? ?????: ");
-    fgets(pt_tel, sizeof(pt_tel), stdin);
-    strtok(pt_tel, "\n");
+    gotoxy(x, y);
+    gets(pt_no);
 
-    printf("??? ????? (?/?): ");
-    fgets(pt_gender, sizeof(pt_gender), stdin);
-    strtok(pt_gender, "\n");
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_name);
 
-    printf("???? ?????: ");
-    fgets(pt_department, sizeof(pt_department), stdin);
-    strtok(pt_department, "\n");
+ 
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_birth);
 
-    printf("?? ??? ????? (YYYY-MM-DD HH24:MI): ");
-    fgets(pt_reservation_date, sizeof(pt_reservation_date), stdin);
-    strtok(pt_reservation_date, "\n");
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_tel);
 
-    /* --------------------------------------------------------------------------
-       ???? ???? ???? SQL ? ??
-    -------------------------------------------------------------------------- */
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_gender);
+
+
     sprintf(sqlstmt,
         "INSERT INTO reservation (pat_no, pat_name, pat_birth, pat_tel, pat_gender, pat_department, reservation_date) "
         "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
         pt_no, pt_name, pt_birth, pt_tel, pt_gender, pt_department, pt_reservation_date);
 
-    /* --------------------------------------------------------------------------
-       SQL ? ?? (???? ?????)
-    -------------------------------------------------------------------------- */
+    
     printf("SQL ?? ?: %s\n", sqlstmt);
 
     /* SQL ?? ????? */
@@ -463,7 +454,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
 
    int x, y, count=0, i ;
 
-   /*  ? */
+   /* ???*/
    clrscr();
 
    print_screen("scr_select.txt");
@@ -472,10 +463,10 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
    gets(no_temp); 
    
 
-     //? sql
+     //? sql
    sprintf(sqlstmt, "SELECT res_no, res_pt, res_doc, res_dept FROM reservation WHERE res_pt = '%s'", no_temp);
 
-   /* select   ? ? ?? ? */
+   /* select  ??????? ? */
    //printf("sqlstmt:%s\n", sqlstmt);
 
    /* EXEC SQL PREPARE S FROM :sqlstmt ; */ 
@@ -511,7 +502,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
    sqlstm.sqpadto = sqlstm.sqadto;
    sqlstm.sqptdso = sqlstm.sqtdso;
    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-   if (sqlca.sqlcode < 0) sql_error("\7?:");
+   if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -540,7 +531,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
    sqlstm.occurs = (unsigned int  )0;
    sqlstm.sqcmod = (unsigned int )0;
    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-   if (sqlca.sqlcode < 0) sql_error("\7?:");
+   if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
  
@@ -548,7 +539,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
    x = 14;
    y = 10 ;
 
-   // EXEC SQL WHENEVER NOT FOUND DO break ;   ? ? ?µ   ?  
+   // EXEC SQL WHENEVER NOT FOUND DO break ;   ?????µ   ?? ?
    while(1)
     {
         /* 3. tuple fetch */
@@ -604,12 +595,12 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
        
-        if(sqlca.sqlcode == 1403) {  // ?    
+        if(sqlca.sqlcode == 1403) {  // ??   ?
             break;
         }
         res_pt.arr[res_pt.len] = '\0' ;
@@ -625,7 +616,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
             count = 0;
             getch();
 
-            gotoxy(0,10); // ? ? ?
+            gotoxy(0,10); // ? ???
             for(i= 0; i < PAGE_NUM; i++){
                 printf("                                                                                               \n");
             }
@@ -651,12 +642,12 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
 
-    getch();   // ?? ?. 
+    getch();   // ?? ?. 
 
 }
 /*------------ insert -------------*/
@@ -681,20 +672,20 @@ void insert_tuple()
    clrscr();
    print_screen("scr_insert.txt");
 
-   /*  ? */
+   /*  ??*/
     x = 40;
     y = 6 ;
 
-   /* ? ? */
+   /* ? ??*/
     gotoxy(x,y)  ; 
     gets(pt_no );
     
-   /*  ? ? */
+   /* ?????*/
     y = y + 2 ;
     gotoxy(x,y)  ;
     gets(pt_name);
 
-   /*  ? */
+   /*  ??*/
     y = y + 2 ;
     gotoxy(x,y) ;
     gets(pt_birth);
@@ -711,9 +702,9 @@ void insert_tuple()
     sprintf(sqlstmt,"insert into patient(pat_no, pat_name, pat_birth, pat_tel, pat_gender) values ( %s, '%s', '%s', '%s', '%s')" ,pt_no, pt_name, pt_birth, pt_tel, pt_gender);
 
    
-    /*   ? */
+    /*   ??*/
     /* EXEC SQL EXECUTE IMMEDIATE :sqlstmt; */
-    printf("Executing SQL: %s\n", sqlstmt); //  
+    printf("Executing SQL: %s\n", sqlstmt); //  ?
 
     /* ? ? */
     clrscr();
@@ -722,7 +713,7 @@ void insert_tuple()
    /* insert   */
     Error_flag = 0 ;
 
-   // ?   ?  ?? error ó ? . Error_flag=1 ? 
+   // ??  ?? ???error ??? . Error_flag=1 ??
     /* EXEC SQL EXECUTE IMMEDIATE :sqlstmt ; */ 
 
 {
@@ -756,14 +747,14 @@ void insert_tuple()
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
 
-    if( Error_flag == 0 ) {  //   ? 
+    if( Error_flag == 0 ) {  //   ???
         printf("\n");	
-        printf("  ???.  ?? ? \n" ) ;
+        printf("  ????  ?? ? \n" ) ;
         /* EXEC SQL COMMIT WORK ; */ 
 
 {
@@ -779,7 +770,7 @@ void insert_tuple()
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -787,7 +778,7 @@ void insert_tuple()
     }
     else {
         printf("\n");	
-        printf(" ? ? ???. ?? ? \n" ) ;
+        printf(" ? ?????? ?? ? \n" ) ;
         /* EXEC SQL ROLLBACK WORK ; */ 
 
 {
@@ -803,7 +794,7 @@ void insert_tuple()
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -850,7 +841,7 @@ int i;
     gotoxy(x,y)  ; 
     gets(findno) ;
 
-/*------     ã? ?  ----------------*/
+/*------     ????? ----------------*/
 
     sprintf(sqlstmt,"SELECT empno, ename, job  FROM emp where empno = %s", findno) ;
 
@@ -889,7 +880,7 @@ int i;
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -916,7 +907,7 @@ int i;
     sqlstm.occurs = (unsigned int  )0;
     sqlstm.sqcmod = (unsigned int )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
  
@@ -975,12 +966,12 @@ int i;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
 
-        if(sqlca.sqlcode == 1403) {  // ?    
+        if(sqlca.sqlcode == 1403) {  // ??   ?
             break;
         }
 
@@ -989,7 +980,7 @@ int i;
         v_job.arr[v_job.len] = '\0';
 
         printf("\n");
-        printf("                            ?:%s    ?:%s   :%s \n", v_empno.arr, v_ename.arr, v_job.arr );
+        printf("                            ?:%s    ??%s   :%s \n", v_empno.arr, v_ename.arr, v_job.arr );
     }
     /* EXEC SQL CLOSE u_cursor; */ 
 
@@ -1006,37 +997,37 @@ int i;
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
  
 
-    /*    ?   ?   ?  */
+    /*    ??  ??? ?? */
     if ( sqlca.sqlerrd[2] == 0 ) {
-        printf("?  ?!!!  ?? ?");
+        printf("?? ??!!  ?? ?");
         getch();
         return ;
     }
 
-    //---------- update ó --------------
- /*   ? */
+    //---------- update ??--------------
+ /*   ??*/
     x = 40;
     y = 12 ;
 
-   /* ? ? */
+   /* ? ??*/
     gotoxy(x,y)  ; 
     gets(no);
     if( no[0] == '\0' ){
         strcpy(no, v_empno.arr);
    }
-   /*  ? ? */
+   /* ?????*/
     y = y + 2 ;
     gotoxy(x,y)  ;
     gets(name);
     if( name[0] == '\0' ){
         strcpy(name, v_ename.arr);
    }
-   /*  ? */
+   /*  ??*/
     y = y + 2 ;
     gotoxy(x,y) ;
     gets(job);
@@ -1049,7 +1040,7 @@ int i;
      /* update  */
     Error_flag = 0 ;
 
-   // ?   ?  ?? error ó ? . Error_flag=1 ? 
+   // ??  ?? ???error ??? . Error_flag=1 ??
     /* EXEC SQL EXECUTE IMMEDIATE :sqlstmt ; */ 
 
 {
@@ -1083,14 +1074,14 @@ int i;
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
 
-    if( Error_flag == 0 ) {  //   ? 
+    if( Error_flag == 0 ) {  //   ???
         printf("\n");	
-        printf(" ??. ?? ? \n" ) ;
+        printf(" ??? ?? ? \n" ) ;
         /* EXEC SQL COMMIT WORK ; */ 
 
 {
@@ -1106,7 +1097,7 @@ int i;
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -1114,7 +1105,7 @@ int i;
     }
     else {
         printf("\n");	
-        printf("  ???. ?? ? \n" ) ;
+        printf("  ???? ?? ? \n" ) ;
         /* EXEC SQL ROLLBACK WORK ; */ 
 
 {
@@ -1130,7 +1121,7 @@ int i;
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -1172,7 +1163,7 @@ int i;
     gotoxy(x,y)  ; 
     gets(no) ;
 
-/*------    ã? ?  ----------------*/
+/*------    ????? ----------------*/
 
     sprintf(sqlstmt, "SELECT res_pt, TO_CHAR(res_dept_date, 'YYYY-MM-DD') FROM reservation WHERE res_no = %s", no);
 
@@ -1211,7 +1202,7 @@ int i;
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
@@ -1238,7 +1229,7 @@ int i;
     sqlstm.occurs = (unsigned int  )0;
     sqlstm.sqcmod = (unsigned int )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
  
@@ -1289,19 +1280,19 @@ int i;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
 
-        if(sqlca.sqlcode == 1403) {  // ?    
+        if(sqlca.sqlcode == 1403) {  // ??   ?
             break;
         }
 
         v_res_pt.arr[v_res_pt.len] = '\0';
         v_res_dept_date.arr[v_res_dept_date.len] = '\0';
         printf("\n\n");
-        printf("                                ??:%s    ?¥:%s \n", v_res_pt.arr, v_res_dept_date.arr);
+        printf("                                ???%s    ??%s \n", v_res_pt.arr, v_res_dept_date.arr);
     }
     /* EXEC SQL CLOSE d_cursor; */ 
 
@@ -1318,28 +1309,28 @@ int i;
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7?:");
+    if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
  
 
-    /*    ?   ?   ?  */
+    /*    ??  ??? ?? */
     if ( sqlca.sqlerrd[2] == 0 ) {
-        printf("?  ?!!!  ?? ?");
+        printf("?? ??!!  ?? ?");
         getch();
         return ;
     }
 
-    //  ó ?
-    printf(" õ ?ğ??? (y/n) :");   
+    //  ????
+    printf(" õ????? (y/n) :");   
 
     flag = (char *)getchar() ;
-    while (getchar() != '\n');  // ù   ? 
+    while (getchar() != '\n');  // ??  ??
 
     if( flag == 'y' || flag =='Y' ){
         sprintf(sqlstmt,"delete from reservation where res_no = %s ", no);
         //printf("stmt:%s\n", sqlstmt);
-        // ?   ?  ?? error ó ? . Error_flag=1 ? 
+        // ??  ?? ???error ??? . Error_flag=1 ??
         Error_flag = 0 ;
         /* EXEC SQL EXECUTE IMMEDIATE :sqlstmt ; */ 
 
@@ -1374,14 +1365,14 @@ int i;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7?:");
+        if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
 
-        if( Error_flag == 0 ) {  //   ? 
+        if( Error_flag == 0 ) {  //   ???
             printf("\n");	
-            printf("  ??.  ?? ? \n" ) ;
+            printf("  ???  ?? ? \n" ) ;
             /* EXEC SQL COMMIT WORK ; */ 
 
 {
@@ -1397,15 +1388,15 @@ int i;
             sqlstm.sqlety = (unsigned short)4352;
             sqlstm.occurs = (unsigned int  )0;
             sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-            if (sqlca.sqlcode < 0) sql_error("\7?:");
+            if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
             getch();
         }
-        else {   //Error_falg == 1.  ? 
+        else {   //Error_falg == 1.  ???
             printf("\n");	
-            printf(" ?  ???. ?? ? \n" ) ;
+            printf(" ?  ???? ?? ? \n" ) ;
             /* EXEC SQL ROLLBACK WORK ; */ 
 
 {
@@ -1421,17 +1412,17 @@ int i;
             sqlstm.sqlety = (unsigned short)4352;
             sqlstm.occurs = (unsigned int  )0;
             sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-            if (sqlca.sqlcode < 0) sql_error("\7?:");
+            if (sqlca.sqlcode < 0) sql_error("\7??");
 }
 
 
             getch();
         }
     }
-    else {    //  
+    else {    //  ?
         printf("\n");	
-        printf(" \n");
-        printf("??  : ?? ?. ");
+        printf(" ?n");
+        printf("??? : ?? ?. ");
         getch();
     }
 
@@ -1474,19 +1465,19 @@ void sql_error(char *msg)
 
     getxy(&x, &y);  //  ? ? 
 
-    Error_flag = 1;    // ? 
+    Error_flag = 1;    // ??
 
-    gotoxy(1,22) ;   // ? ?
+    gotoxy(1,22) ;   // ????
 
     printf("%s", msg);
     buf_len = sizeof (err_msg);
     sqlglm(err_msg, &buf_len, &msg_len);
     printf("%.*s\n", msg_len, err_msg);
 
-    gotoxy(x, y) ;   //  ?  ? ? ?
+    gotoxy(x, y) ;   //  ?? ? ? ??
     //getch();
 }
-/*---------------  ? ?  ? --------------------*/
+/*---------------  ? ?  ??--------------------*/
 #define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
 
 void gotoxy(int x, int y)
