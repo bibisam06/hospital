@@ -1,0 +1,645 @@
+// 마지막고침 : 2024.11.5
+// win32 Visual C 2010 이상컴파일시 추가
+// 프로그램 가장 첫 줄에 추가할 것
+#define _CRT_SECURE_NO_WARNINGS
+//-----------------------------------------
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <conio.h>
+#include <ctype.h>
+
+/* for oracle */
+#include <sqlda.h>
+#include <sqlca.h>
+#include <sqlcpr.h>
+
+
+// win32 Visual C 2010 이상컴파일시 추가
+#define getch() _getch()
+//-----------------------------------------
+
+/*---------------  화면 커서 위치 제어 ----------------------*/
+#include < windows.h >
+void gotoxy(int x, int y) ;
+void getxy(int *x, int *y) ;
+void clrscr(void) ;
+/*-----------------------------------------------------------*/
+void print_screen(char fname[]);
+void db_connect();
+void select_tuple();
+void insert_tuple();
+void delete_tuple();
+void update_tuple();
+void sql_error();
+
+int Error_flag = 0;
+void main()
+{
+    char c = 0;
+
+    _putenv("NLS_LANG=American_America.KO16KSC5601");  //한글사용시 필요함
+
+   /* Register sql_error() as the error handler. */
+    EXEC SQL WHENEVER SQLERROR DO sql_error("\7에러발생:");
+
+    db_connect();
+
+    while( c != '5') {  
+        // 메인 화면 출력
+        clrscr();
+
+        print_screen("scr_main.txt") ;
+        gotoxy(49,15);
+
+        
+        c = getchar() ;
+        while (getchar() != '\n');  // 첫글자 외 나머지 입력 버림
+
+        switch(c){
+            case '1' : select_tuple();
+                         break;
+            case '2' : insert_tuple();
+                         break;
+            case '3' : delete_tuple();
+                         break;
+            case '4' : update_tuple();
+                         break;
+            default : break ;
+	
+        }		
+    }
+ 	
+    clrscr();
+    EXEC SQL COMMIT WORK RELEASE ;
+}
+
+void db_connect()
+{
+    EXEC SQL BEGIN DECLARE SECTION;
+	VARCHAR uid[80];
+	VARCHAR pwd[20];
+    EXEC SQL END DECLARE SECTION;
+
+    strcpy(uid.arr,"a20203221@//sedb2.deu.ac.kr:1521/orcl");
+    uid.len =  strlen(uid.arr);
+    strcpy(pwd.arr,"20203221");
+    pwd.len = strlen(pwd.arr);
+
+    Error_flag = 0 ;  
+
+   // 아래 문장 수행 중에 에러가 발생하면 error 처리 루틴으로 감. Error_flag=1로 바뀜 
+    EXEC SQL CONNECT :uid IDENTIFIED BY :pwd;
+
+    // connection이 실패했을경우의 처리부분
+    if ( Error_flag ==1 ){
+        //printf("Connect error: %s", sqlca.sqlerrm.sqlerrmc);
+        exit(-1);
+    }
+}
+
+
+#define PAGE_NUM 5
+void select_tuple()
+{
+/* --------------------------------------------------------------------------
+   Retrieve the current maximum employee number
+-------------------------------------------------------------------------- */
+EXEC SQL BEGIN DECLARE SECTION;
+   varchar v_empno[100];
+   varchar v_ename[100];
+   varchar v_job[100];
+
+   char sqlstmt[1000];
+EXEC SQL END DECLARE SECTION;
+
+   char no_temp[20];
+   char name_temp[20];
+
+   int x, y, count=0, i ;
+
+   /* 사용자 입력 */
+   clrscr();
+
+   print_screen("scr_select.txt");
+
+   gotoxy(22,5);
+   gets(no_temp); 
+   
+   gotoxy(57,5);
+   gets(name_temp);
+      
+   /* 실행시킬 SQL 문장*/
+   sprintf(sqlstmt,"SELECT empno, ename, job FROM emp where to_char(empno) LIKE '%%%s%%' and ename LIKE '%%%s%%'  ",
+                    no_temp, name_temp); 
+
+   /* select 문장이 제대로 구성되어 있는지 화면에 찍어봄 */
+   //printf("sqlstmt:%s\n", sqlstmt);
+
+   EXEC SQL PREPARE S FROM :sqlstmt ;
+
+   /* 1. cursor declare */
+   EXEC SQL DECLARE c_cursor CURSOR FOR S ; 
+
+   /* 2. cursor open */
+   EXEC SQL OPEN c_cursor ; 
+
+   x = 14;
+   y = 10 ;
+
+   // EXEC SQL WHENEVER NOT FOUND DO break ;  원래는 이렇게 해야 하는데 버그 때문에 아래와 같이 사용함
+   while(1)
+    {
+        /* 3. tuple fetch */
+        EXEC SQL FETCH c_cursor INTO :v_empno, :v_ename, :v_job;
+       
+        if(sqlca.sqlcode == 1403) {  // 더이상 가져올 투플이 없는 경우
+            break;
+        }
+        v_empno.arr[v_empno.len] = '\0' ;
+        v_ename.arr[v_ename.len] = '\0';
+        v_job.arr[v_job.len] = '\0';
+
+        gotoxy(x,y);
+        printf(" | %-4s      |    %-10s  |    %-10s |", v_empno.arr, v_ename.arr , v_job.arr);
+        y++;
+        count++;
+        if( count == PAGE_NUM){
+            printf("\n\n                                  hit any key for next\n");
+            count = 0;
+            getch();
+
+            gotoxy(0,10); //이전 화면 부분 클리어
+            for(i= 0; i < PAGE_NUM; i++){
+                printf("                                                                                               \n");
+            }
+            y = 10 ;
+        }
+    }
+    printf("\n");	
+    printf("                          match tuple no : %d\n", sqlca.sqlerrd[2]);
+
+    /* 4. close the cursor. */
+    EXEC SQL CLOSE c_cursor;
+
+    getch();   // 아무키나 치세요. 
+
+}
+/*------------ insert -------------*/
+void insert_tuple()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+
+    char sqlstmt[1000];
+
+EXEC SQL END DECLARE SECTION;
+
+    char v_empno[5];
+    char v_ename[17];
+    char v_job[16];
+
+    int x, y ;
+
+   clrscr();
+   print_screen("scr_insert.txt");
+
+   /* 데이터 입력 */
+    x = 40;
+    y = 6 ;
+
+   /* 사원번호 입력 */
+    gotoxy(x,y)  ; 
+    gets(v_empno );
+    
+   /* 사원 이름 입력 */
+    y = y + 2 ;
+    gotoxy(x,y)  ;
+    gets(v_ename);
+
+   /* 직급 입력 */
+    y = y + 2 ;
+    gotoxy(x,y) ;
+    gets(v_job);
+	
+    sprintf(sqlstmt,"insert into emp(empno, ename, job) values ( %s, '%s', '%s')" ,v_empno, v_ename, v_job);
+
+    // printf("sqlstmt:%s\n", sqlstmt);
+
+   /* insert 문 실행 */
+    Error_flag = 0 ;
+
+   // 아래 문장 수행 중에 에러가 발생하면 error 처리 루틴으로 감. Error_flag=1로 바뀜 
+    EXEC SQL EXECUTE IMMEDIATE :sqlstmt ;
+
+    if( Error_flag == 0 ) {  // 정상적으로 수행 되는 경우
+        printf("\n");	
+        printf(" 정상적으로 추가되었습니다.  아무키나 치세요 \n" ) ;
+        EXEC SQL COMMIT WORK ;
+        getch();
+    }
+    else {
+        printf("\n");	
+        printf(" 튜플이 추가되지 않았습니다. 아무키나 치세요 \n" ) ;
+        EXEC SQL ROLLBACK WORK ;
+        getch();
+    }
+}
+void reserve_tuple() {
+    // SQL 변수 선언
+    EXEC SQL BEGIN DECLARE SECTION;
+    varchar v_res_pt[100];      // 환자 이름
+    varchar v_res_birth[20];    // 환자 생년월일 (YYYY-MM-DD 형식)
+    varchar v_res_phone[20];    // 전화번호
+    varchar v_res_gender[10];   // 성별 (남/여)
+    varchar v_res_dept[100];    // 진료과
+    varchar v_res_date[100];    // 예약 날짜 (YYYY-MM-DD HH24:MI 형식)
+    int pat_no;                 // 환자 번호
+    int res_no;                 // 예약 번호
+    int doc_no;                 // 의사 번호
+    EXEC SQL END DECLARE SECTION;
+
+    char confirm;               // 예약 확인 여부
+
+    // 화면 초기화 및 예약 입력 화면 출력
+    clrscr();
+    print_screen("scr_add_reservation.txt");
+
+    // 입력받기
+    printf("환자 이름: ");
+    fgets(v_res_pt.arr, sizeof(v_res_pt.arr), stdin);
+    v_res_pt.arr[strcspn(v_res_pt.arr, "\n")] = '\0';  // 개행 문자 제거
+    v_res_pt.len = strlen(v_res_pt.arr);
+
+    printf("\n생년월일 (YYYY-MM-DD): ");
+    fgets(v_res_birth.arr, sizeof(v_res_birth.arr), stdin);
+    v_res_birth.arr[strcspn(v_res_birth.arr, "\n")] = '\0';
+    v_res_birth.len = strlen(v_res_birth.arr);
+
+    printf("\n전화번호: ");
+    fgets(v_res_phone.arr, sizeof(v_res_phone.arr), stdin);
+    v_res_phone.arr[strcspn(v_res_phone.arr, "\n")] = '\0';
+    v_res_phone.len = strlen(v_res_phone.arr);
+
+    printf("\n성별 (남/여): ");
+    fgets(v_res_gender.arr, sizeof(v_res_gender.arr), stdin);
+    v_res_gender.arr[strcspn(v_res_gender.arr, "\n")] = '\0';
+    v_res_gender.len = strlen(v_res_gender.arr);
+
+    printf("\n진료과: ");
+    fgets(v_res_dept.arr, sizeof(v_res_dept.arr), stdin);
+    v_res_dept.arr[strcspn(v_res_dept.arr, "\n")] = '\0';
+    v_res_dept.len = strlen(v_res_dept.arr);
+
+    printf("\n예약일 (YYYY-MM-DD HH24:MI): ");
+    fgets(v_res_date.arr, sizeof(v_res_date.arr), stdin);
+    v_res_date.arr[strcspn(v_res_date.arr, "\n")] = '\0';
+    v_res_date.len = strlen(v_res_date.arr);
+
+    // 진료과에 맞는 의사 번호 검색
+    EXEC SQL SELECT doc_no
+        INTO : doc_no
+        FROM doctor
+        WHERE dept_name = : v_res_dept;
+
+    if (sqlca.sqlcode != 0) {
+        printf("\n진료과에 해당하는 의사가 없습니다. 아무 키나 입력하세요.\n");
+        getch();
+        return;
+    }
+
+    // 환자 번호 및 예약 번호 생성
+    EXEC SQL SELECT NVL(MAX(pat_no), 0) + 1 INTO :pat_no FROM patient;
+    EXEC SQL SELECT NVL(MAX(res_no), 0) + 1 INTO :res_no FROM reservation;
+
+    // 확인 여부 입력
+    printf("\n입력하신 정보를 저장하시겠습니까? (y/n): ");
+    confirm = getchar();
+    while (getchar() != '\n');  // 입력 버퍼 초기화
+
+    if (confirm == 'y' || confirm == 'Y') {
+        // 환자 정보 삽입
+        EXEC SQL INSERT INTO patient(
+            pat_no, pat_name, pat_birth, pat_phone, pat_gender
+        ) VALUES(
+            :pat_no, : v_res_pt, : v_res_birth, : v_res_phone, : v_res_gender
+        );
+
+        if (sqlca.sqlcode != 0) {
+            printf("\n환자 정보 저장 중 오류 발생: %s\n", sqlca.sqlerrm.sqlerrmc);
+            EXEC SQL ROLLBACK WORK;
+            getch();
+            return;
+        }
+
+        // 예약 정보 삽입
+        EXEC SQL INSERT INTO reservation(
+            res_no, pat_no, doc_no, res_date, res_dept
+        ) VALUES(
+            :res_no, : pat_no, : doc_no, TO_DATE(:v_res_date, 'YYYY-MM-DD HH24:MI'), : v_res_dept
+        );
+
+        if (sqlca.sqlcode == 0) {
+            printf("\n예약이 성공적으로 추가되었습니다. 아무 키나 입력하세요.\n");
+            EXEC SQL COMMIT WORK;
+        }
+        else {
+            printf("\n예약 정보 저장 중 오류 발생: %s\n", sqlca.sqlerrm.sqlerrmc);
+            EXEC SQL ROLLBACK WORK;
+        }
+        getch();
+    }
+    else {
+        printf("\n예약 추가가 취소되었습니다. 아무 키나 입력하세요.\n");
+        getch();
+    }
+}
+
+void update_tuple()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+    varchar v_empno[100];
+    varchar v_ename[100];
+    varchar v_job[16];
+
+    char sqlstmt[1000];
+EXEC SQL END DECLARE SECTION;
+
+    char findno[100] ;
+    char no[100] ;
+    char name[100];
+    char job[100];
+
+    char  flag = 'n' ;
+    int x, y ;
+int i;
+//----------------------------------------
+
+   clrscr();
+   print_screen("scr_update.txt");
+
+    x = 40;
+    y = 6 ;
+
+    gotoxy(x,y)  ; 
+    gets(findno) ;
+
+/*------  수정할 투플을 먼저 찾아서 사용자에게 보여줌 ----------------*/
+
+    sprintf(sqlstmt,"SELECT empno, ename, job  FROM emp where empno = %s", findno) ;
+
+    //printf("stmt:%s\n", sqlstmt);
+
+    EXEC SQL PREPARE S FROM :sqlstmt ;
+
+    EXEC SQL DECLARE u_cursor CURSOR FOR S ; 
+
+    EXEC SQL OPEN u_cursor ; 
+
+    while(1)
+    {
+        EXEC SQL FETCH u_cursor INTO :v_empno, :v_ename, :v_job ;
+
+        if(sqlca.sqlcode == 1403) {  // 더이상 가져올 투플이 없는 경우
+            break;
+        }
+
+        v_empno.arr[v_empno.len] = '\0';
+        v_ename.arr[v_ename.len] = '\0';
+        v_job.arr[v_job.len] = '\0';
+
+        printf("\n");
+        printf("                            사원번호:%s    사원이름:%s   직급:%s \n", v_empno.arr, v_ename.arr, v_job.arr );
+    }
+    EXEC SQL CLOSE u_cursor; 
+
+    /*  가져온 투플이 하나도 없는 경우는 메시지 출력 후 돌아가야 함 */
+    if ( sqlca.sqlerrd[2] == 0 ) {
+        printf("검색된 투플이 없습니다!!!  아무키나 치세요");
+        getch();
+        return ;
+    }
+
+    //---------- update 처리 --------------
+ /* 수정 데이터 입력 */
+    x = 40;
+    y = 12 ;
+
+   /* 사원번호 입력 */
+    gotoxy(x,y)  ; 
+    gets(no);
+    if( no[0] == '\0' ){
+        strcpy(no, v_empno.arr);
+   }
+   /* 사원 이름 입력 */
+    y = y + 2 ;
+    gotoxy(x,y)  ;
+    gets(name);
+    if( name[0] == '\0' ){
+        strcpy(name, v_ename.arr);
+   }
+   /* 직급 입력 */
+    y = y + 2 ;
+    gotoxy(x,y) ;
+    gets(job);
+    if( job[0] == '\0' ){
+        strcpy(job, v_job.arr);
+    }
+    sprintf(sqlstmt,"update emp set empno = %s, ename= '%s', job = '%s' where empno = %s ", no, name, job, findno);
+    //printf("stmt:%s\n", sqlstmt);
+    
+     /* update문 실행 */
+    Error_flag = 0 ;
+
+   // 아래 문장 수행 중에 에러가 발생하면 error 처리 루틴으로 감. Error_flag=1로 바뀜 
+    EXEC SQL EXECUTE IMMEDIATE :sqlstmt ;
+
+    if( Error_flag == 0 ) {  // 정상적으로 수행 되는 경우
+        printf("\n");	
+        printf(" 수정되었습니다. 아무키나 치세요 \n" ) ;
+        EXEC SQL COMMIT WORK ;
+        getch();
+    }
+    else {
+        printf("\n");	
+        printf(" 수정되지 않았습니다. 아무키나 치세요 \n" ) ;
+        EXEC SQL ROLLBACK WORK ;
+        getch();
+    }
+   //EXEC SQL EXECUTE IMMEDIATE :sqlstmt ;
+
+  // EXEC SQL COMMIT WORK ; 
+
+}
+void delete_tuple()
+{
+
+EXEC SQL BEGIN DECLARE SECTION;
+    varchar v_res_pt[100];
+    varchar v_res_dept_date[100];
+ 
+    char sqlstmt[1000];
+EXEC SQL END DECLARE SECTION;
+
+    char  no[100] ;
+    char  flag = 'n' ;
+    int x, y ;
+int i;
+//----------------------------------------
+
+   clrscr();
+   print_screen("scr_delete.txt");
+
+    x = 40;
+    y = 6 ;
+
+    gotoxy(x,y)  ; 
+    gets(no) ;
+
+/*------ 삭제할 투플을 먼저 찾아서 사용자에게 보여줌 ----------------*/
+
+    sprintf(sqlstmt, "SELECT res_pt, TO_CHAR(res_dept_date, 'YYYY-MM-DD') FROM reservation WHERE res_no = %s", no);
+
+    //printf("stmt:%s\n", sqlstmt);
+
+    EXEC SQL PREPARE S FROM :sqlstmt ;
+
+    EXEC SQL DECLARE d_cursor CURSOR FOR S ; 
+
+    EXEC SQL OPEN d_cursor ; 
+
+    while(1)
+    {
+        EXEC SQL FETCH d_cursor INTO :v_res_pt, :v_res_dept_date ;
+
+        if(sqlca.sqlcode == 1403) {  // 더이상 가져올 투플이 없는 경우
+            break;
+        }
+
+        v_res_pt.arr[v_res_pt.len] = '\0';
+        v_res_dept_date.arr[v_res_dept_date.len] = '\0';
+        printf("\n\n");
+        printf("                                환자성함:%s    예약날짜:%s \n", v_res_pt.arr, v_res_dept_date.arr);
+    }
+    EXEC SQL CLOSE d_cursor; 
+
+    /*  가져온 투플이 하나도 없는 경우는 메시지 출력 후 돌아가야 함 */
+    if ( sqlca.sqlerrd[2] == 0 ) {
+        printf("검색된 투플이 없습니다!!!  아무키나 치세요");
+        getch();
+        return ;
+    }
+
+    // 삭제 처리 부분
+    printf("위의 투플들을 삭제하시겠습니까? (y/n) :");   
+
+    flag = (char *)getchar() ;
+    while (getchar() != '\n');  // 첫글자 외 나머지 입력 버림
+
+    if( flag == 'y' || flag =='Y' ){
+        sprintf(sqlstmt,"delete from reservation where res_no = %s ", no);
+        //printf("stmt:%s\n", sqlstmt);
+        // 아래 문장 수행 중에 에러가 발생하면 error 처리 루틴으로 감. Error_flag=1로 바뀜 
+        Error_flag = 0 ;
+        EXEC SQL EXECUTE IMMEDIATE :sqlstmt ;
+
+        if( Error_flag == 0 ) {  // 정상적으로 수행 되는 경우
+            printf("\n");	
+            printf(" 정상적으로 삭제되었습니다.  아무키나 치세요 \n" ) ;
+            EXEC SQL COMMIT WORK ;
+            getch();
+        }
+        else {   //Error_falg == 1. 에러가 발생된 경우
+            printf("\n");	
+            printf(" 튜플이 삭제되지 않았습니다. 아무키나 치세요 \n" ) ;
+            EXEC SQL ROLLBACK WORK ;
+            getch();
+        }
+    }
+    else {    // 삭제 취소
+        printf("\n");	
+        printf("삭제 취소\n");
+        printf("메인메뉴로 가기 : 아무키나 치세요. ");
+        getch();
+    }
+
+}
+//==================================================
+
+void print_screen(char fname[])
+{
+    FILE *fp;
+    char line[100];
+
+    if ( (fp = fopen(fname,"r"))  == NULL ){
+        printf("file open error\n");
+        getch();
+        exit(-1);
+    }
+    while(1) {
+        if( fgets(line, 99, fp) == NULL){
+            break;
+        }
+        printf("%s", line);
+    }
+
+    fclose(fp);
+}
+
+/* --------------------------------------------------------------------------
+int sql_error()
+
+   errrpt prints the ORACLE error msg and number.
+-------------------------------------------------------------------------- */
+void sql_error(char *msg)
+{
+    char err_msg[128];
+    size_t buf_len, msg_len;
+    int x, y ;
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    getxy(&x, &y);  // 현재 커서 위치 저장
+
+    Error_flag = 1;    //에러가 발생됨을 셋팅함
+
+    gotoxy(1,22) ;   //마지막 줄로 이동
+
+    printf("%s", msg);
+    buf_len = sizeof (err_msg);
+    sqlglm(err_msg, &buf_len, &msg_len);
+    printf("%.*s\n", msg_len, err_msg);
+
+    gotoxy(x, y) ;   // 저장해 두었던 원래 커서 위치로 이동
+    //getch();
+}
+/*---------------  화면 커서 제어 함수 --------------------*/
+#define STD_HANDLE GetStdHandle(STD_OUTPUT_HANDLE)
+
+void gotoxy(int x, int y)
+{
+    COORD Cur= {(SHORT)x, (SHORT) y};
+
+    SetConsoleCursorPosition(STD_HANDLE, Cur);
+}
+
+void getxy(int *x, int *y)
+{
+    CONSOLE_SCREEN_BUFFER_INFO Buf ;
+
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Buf);
+    *x = (int)Buf.dwCursorPosition.X ;
+    *y = (int)Buf.dwCursorPosition.Y ;
+ 
+}
+
+void clrscr(void)
+{
+    COORD Cur= {0, 0};
+    unsigned long dwLen;
+
+//    FillConsoleOutputCharacter(STD_HANDLE, ' ', 80*25, Cur, &dwLen);
+    FillConsoleOutputCharacter(STD_HANDLE, ' ', 120*28, Cur, &dwLen);
+    gotoxy(0,0);
+}
+
+/*---------------------------------------------------------*/
