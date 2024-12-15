@@ -2,6 +2,11 @@
 /* Result Sets Interface */
 #ifndef SQL_CRSR
 #  define SQL_CRSR
+//select tuple함수를 위한 정의
+#define MAX_RECORDS 100  // 최대 레코드 수 정의
+#define MAX_STRING_LEN 100
+
+
   struct sql_cursor
   {
     unsigned int curocn;
@@ -224,15 +229,15 @@ void main()
         while (getchar() != '\n');  // ?씅?씅 씅씅씅 ??씅씅
 
         switch(c){
-            case '1' : select_tuple();
+           // case '1' : select_tuple();
+                       //  break;
+            case '1' : insert_tuple();
                          break;
-            case '2' : insert_tuple();
+            case '2' : delete_tuple();
                          break;
-            case '3' : delete_tuple();
+            case '3' : update_tuple();
                          break;
-            case '4' : update_tuple();
-                         break;
-          case '5': reserve_tuple();
+          case '4': reserve_tuple();
                 break;
          // case '6': break;
             default : break ;
@@ -493,227 +498,67 @@ int simulate_sql_execution(const char *sqlstmt) {
     return 0; // ???? ??
 }
 
+# define PAGE_NUM 5
+typedef struct {
+    char res_no[MAX_STRING_LEN];
+    char res_pt[MAX_STRING_LEN];
+    char res_doc[MAX_STRING_LEN];
+    char res_dept[MAX_STRING_LEN];
+} ReservationRecord;
 
-#define PAGE_NUM 5
-void select_tuple()
-{
-/* --------------------------------------------------------------------------
-   Retrieve the current maximum employee number
--------------------------------------------------------------------------- */
-/* EXEC SQL BEGIN DECLARE SECTION; */ 
+void display_records(ReservationRecord records[], int count) {
+    int x = 14, y = 10, page_count = 0;
 
-   /* varchar v_empno[100]; */ 
-struct { unsigned short len; unsigned char arr[100]; } res_pt;
-
-   /* varchar v_ename[100]; */ 
-struct { unsigned short len; unsigned char arr[100]; } res_doc;
-
-   /* varchar v_job[100]; */ 
-struct { unsigned short len; unsigned char arr[100]; } res_dept;
-
-
-   char sqlstmt[1000];
-/* EXEC SQL END DECLARE SECTION; */ 
-
-
-   char no_temp[20];
-   char name_temp[20];
-
-   int x, y, count=0, i ;
-
-   /* 씅씅???*/
-   clrscr();
-
-   print_screen("scr_select.txt");
-
-   gotoxy(28,6);
-   gets(no_temp); 
-   
-
-     //씅씅? sql씅씅씅
-   sprintf(sqlstmt, "SELECT res_no, res_pt, res_doc, res_dept FROM reservation WHERE res_pt = '%s'", no_temp);
-
- 
-{
-   struct sqlexd sqlstm;
-   sqlstm.sqlvsn = 13;
-   sqlstm.arrsiz = 4;
-   sqlstm.sqladtp = &sqladt;
-   sqlstm.sqltdsp = &sqltds;
-   sqlstm.stmt = "";
-   sqlstm.iters = (unsigned int  )1;
-   sqlstm.offset = (unsigned int  )51;
-   sqlstm.cud = sqlcud0;
-   sqlstm.sqlest = (unsigned char  *)&sqlca;
-   sqlstm.sqlety = (unsigned short)4352;
-   sqlstm.occurs = (unsigned int  )0;
-   sqlstm.sqhstv[0] = (         void  *)sqlstmt;
-   sqlstm.sqhstl[0] = (unsigned int  )1000;
-   sqlstm.sqhsts[0] = (         int  )0;
-   sqlstm.sqindv[0] = (         void  *)0;
-   sqlstm.sqinds[0] = (         int  )0;
-   sqlstm.sqharm[0] = (unsigned int  )0;
-   sqlstm.sqadto[0] = (unsigned short )0;
-   sqlstm.sqtdso[0] = (unsigned short )0;
-   sqlstm.sqphsv = sqlstm.sqhstv;
-   sqlstm.sqphsl = sqlstm.sqhstl;
-   sqlstm.sqphss = sqlstm.sqhsts;
-   sqlstm.sqpind = sqlstm.sqindv;
-   sqlstm.sqpins = sqlstm.sqinds;
-   sqlstm.sqparm = sqlstm.sqharm;
-   sqlstm.sqparc = sqlstm.sqharc;
-   sqlstm.sqpadto = sqlstm.sqadto;
-   sqlstm.sqptdso = sqlstm.sqtdso;
-   sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-   if (sqlca.sqlcode < 0) sql_error("\nError Occured");
-}
-
-
-
-   /* 1. cursor declare */
-   /* EXEC SQL DECLARE c_cursor CURSOR FOR S ; */ 
- 
-
-   /* 2. cursor open */
-   /* EXEC SQL OPEN c_cursor ; */ 
-
-{
-   struct sqlexd sqlstm;
-   sqlstm.sqlvsn = 13;
-   sqlstm.arrsiz = 4;
-   sqlstm.sqladtp = &sqladt;
-   sqlstm.sqltdsp = &sqltds;
-   sqlstm.stmt = "";
-   sqlstm.iters = (unsigned int  )1;
-   sqlstm.offset = (unsigned int  )70;
-   sqlstm.selerr = (unsigned short)1;
-   sqlstm.sqlpfmem = (unsigned int  )0;
-   sqlstm.cud = sqlcud0;
-   sqlstm.sqlest = (unsigned char  *)&sqlca;
-   sqlstm.sqlety = (unsigned short)4352;
-   sqlstm.occurs = (unsigned int  )0;
-   sqlstm.sqcmod = (unsigned int )0;
-   sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-   if (sqlca.sqlcode < 0) sql_error("\nError Occured");
-}
-
- 
-
-   x = 14;
-   y = 10 ;
-
-   // EXEC SQL WHENEVER NOT FOUND DO break ;  씅씅씅 ?씅????턁 씅씅 씅씅씅 ?씅?씅씅 씅씅?
-   while(1)
-    {
-        /* 3. tuple fetch */
-        /* EXEC SQL FETCH c_cursor INTO :v_empno, :v_ename, :v_job; */ 
-
-{
-        struct sqlexd sqlstm;
-        sqlstm.sqlvsn = 13;
-        sqlstm.arrsiz = 4;
-        sqlstm.sqladtp = &sqladt;
-        sqlstm.sqltdsp = &sqltds;
-        sqlstm.iters = (unsigned int  )1;
-        sqlstm.offset = (unsigned int  )85;
-        sqlstm.selerr = (unsigned short)1;
-        sqlstm.sqlpfmem = (unsigned int  )0;
-        sqlstm.cud = sqlcud0;
-        sqlstm.sqlest = (unsigned char  *)&sqlca;
-        sqlstm.sqlety = (unsigned short)4352;
-        sqlstm.occurs = (unsigned int  )0;
-        sqlstm.sqfoff = (           int )0;
-        sqlstm.sqfmod = (unsigned int )2;
-        sqlstm.sqhstv[0] = (         void  *)&res_pt;
-        sqlstm.sqhstl[0] = (unsigned int  )102;
-        sqlstm.sqhsts[0] = (         int  )0;
-        sqlstm.sqindv[0] = (         void  *)0;
-        sqlstm.sqinds[0] = (         int  )0;
-        sqlstm.sqharm[0] = (unsigned int  )0;
-        sqlstm.sqadto[0] = (unsigned short )0;
-        sqlstm.sqtdso[0] = (unsigned short )0;
-        sqlstm.sqhstv[1] = (         void  *)&res_doc;
-        sqlstm.sqhstl[1] = (unsigned int  )102;
-        sqlstm.sqhsts[1] = (         int  )0;
-        sqlstm.sqindv[1] = (         void  *)0;
-        sqlstm.sqinds[1] = (         int  )0;
-        sqlstm.sqharm[1] = (unsigned int  )0;
-        sqlstm.sqadto[1] = (unsigned short )0;
-        sqlstm.sqtdso[1] = (unsigned short )0;
-        sqlstm.sqhstv[2] = (         void  *)&res_dept;
-        sqlstm.sqhstl[2] = (unsigned int  )102;
-        sqlstm.sqhsts[2] = (         int  )0;
-        sqlstm.sqindv[2] = (         void  *)0;
-        sqlstm.sqinds[2] = (         int  )0;
-        sqlstm.sqharm[2] = (unsigned int  )0;
-        sqlstm.sqadto[2] = (unsigned short )0;
-        sqlstm.sqtdso[2] = (unsigned short )0;
-        sqlstm.sqphsv = sqlstm.sqhstv;
-        sqlstm.sqphsl = sqlstm.sqhstl;
-        sqlstm.sqphss = sqlstm.sqhsts;
-        sqlstm.sqpind = sqlstm.sqindv;
-        sqlstm.sqpins = sqlstm.sqinds;
-        sqlstm.sqparm = sqlstm.sqharm;
-        sqlstm.sqparc = sqlstm.sqharc;
-        sqlstm.sqpadto = sqlstm.sqadto;
-        sqlstm.sqptdso = sqlstm.sqtdso;
-        sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
-}
-
-
-       
-        if(sqlca.sqlcode == 1403) { 
-            break;
-        }
-        res_pt.arr[res_pt.len] = '\0' ;
-        res_doc.arr[res_doc.len] = '\0';
-        res_dept.arr[res_dept.len] = '\0';
-
-        gotoxy(x,y);
-        printf(" | %-4s      |    %-10s  |    %-10s |", res_pt.arr, res_doc.arr , res_dept.arr);
-        y++;
-        count++;
-        if( count == PAGE_NUM){
-            printf("\n\n                                  hit any key for next\n");
-            count = 0;
-            getch();
-
-            gotoxy(0,10); //씅씅 ?씅 ???씅씅
-            for(i= 0; i < PAGE_NUM; i++){
-                printf("                                                                                               \n");
-            }
-            y = 10 ;
+    for (int i = 0; i < count; i++) {
+        printf(" | %-10s | %-10s | %-10s | %-10s |\n",
+            records[i].res_no, records[i].res_pt, records[i].res_doc, records[i].res_dept);
+        page_count++;
+        if (page_count == PAGE_NUM) {
+            printf("\nPress any key for next page...\n");
+            getchar();
+            page_count = 0;
         }
     }
-    printf("\n");	
-    printf("                          match tuple no : %d\n", sqlca.sqlerrd[2]);
-
-    /* 4. close the cursor. */
-    /* EXEC SQL CLOSE c_cursor; */ 
-
-{
-    struct sqlexd sqlstm;
-    sqlstm.sqlvsn = 13;
-    sqlstm.arrsiz = 4;
-    sqlstm.sqladtp = &sqladt;
-    sqlstm.sqltdsp = &sqltds;
-    sqlstm.iters = (unsigned int  )1;
-    sqlstm.offset = (unsigned int  )112;
-    sqlstm.cud = sqlcud0;
-    sqlstm.sqlest = (unsigned char  *)&sqlca;
-    sqlstm.sqlety = (unsigned short)4352;
-    sqlstm.occurs = (unsigned int  )0;
-    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\nError Occured");
+    printf("\nTotal Records: %d\n", count);
 }
 
+void select_tuple() {
+    char name_temp[20];
+    ReservationRecord records[MAX_RECORDS];
+    int record_count = 0;
 
+    printf("Enter reservation patient name: ");
+    fgets(name_temp, sizeof(name_temp), stdin);
+    name_temp[strcspn(name_temp, "\n")] = '\0'; // Remove newline
 
-    getch();   // ??씅 ?씅씅. 
+    /* SQL: Prepare and execute the query */
+    /* EXEC SQL DECLARE c_cursor CURSOR FOR
+        SELECT res_no, res_pt, res_doc, res_dept
+        FROM reservation WHERE res_pt = :name_temp; */
 
-}
-/*------------ insert -------------*/
+        /* EXEC SQL OPEN c_cursor; */
+
+    while (1) {
+        /* EXEC SQL FETCH c_cursor INTO
+            :records[record_count].res_no,
+            :records[record_count].res_pt,
+            :records[record_count].res_doc,
+            :records[record_count].res_dept; */
+
+        if (sqlca.sqlcode == 1403) { // No more rows
+            break;
+        }
+        if (record_count >= MAX_RECORDS) {
+            printf("Maximum records reached. Some data may not be displayed.\n");
+            break;
+        }
+        record_count++;
+    }
+
+    /* EXEC SQL CLOSE c_cursor; */
+
+    display_records(records, record_count);
+}/*------------ insert -------------*/
 void insert_tuple()
 {
 /* EXEC SQL BEGIN DECLARE SECTION; */ 
@@ -878,8 +723,6 @@ struct { unsigned short len; unsigned char arr[100]; } v_empno;
     /* varchar v_ename[100]; */ 
 struct { unsigned short len; unsigned char arr[100]; } v_ename;
 
-    /* varchar v_job[16]; */ 
-struct { unsigned short len; unsigned char arr[16]; } v_job;
 
 
     char sqlstmt[1000];
@@ -897,7 +740,7 @@ int i;
 //----------------------------------------
 
    clrscr();
-   print_screen("scr_update.txt");
+   print_screen("scr_change.txt");
 
     x = 40;
     y = 6 ;
@@ -1012,7 +855,7 @@ int i;
         sqlstm.sqharm[1] = (unsigned int  )0;
         sqlstm.sqadto[1] = (unsigned short )0;
         sqlstm.sqtdso[1] = (unsigned short )0;
-        sqlstm.sqhstv[2] = (         void  *)&v_job;
+       // sqlstm.sqhstv[2] = (         void  *)&v_job;
         sqlstm.sqhstl[2] = (unsigned int  )18;
         sqlstm.sqhsts[2] = (         int  )0;
         sqlstm.sqindv[2] = (         void  *)0;
@@ -1041,7 +884,7 @@ int i;
 
         v_empno.arr[v_empno.len] = '\0';
         v_ename.arr[v_ename.len] = '\0';
-        v_job.arr[v_job.len] = '\0';
+      //  v_job.arr[v_job.len] = '\0';
 
     /*    printf("\n");
         printf("                            씅씅?:%s    씅씅??%s   씅씅:%s \n", v_empno.arr, v_ename.arr, v_job.arr );*/
@@ -1096,7 +939,7 @@ int i;
     gotoxy(x,y) ;
     gets(job);
     if( job[0] == '\0' ){
-        strcpy(job, v_job.arr);
+       // strcpy(job, v_job.arr);
     }
     sprintf(sqlstmt,"update emp set empno = %s, ename= '%s', job = '%s' where empno = %s ", no, name, job, findno);
     //printf("stmt:%s\n", sqlstmt);
@@ -1220,7 +1063,7 @@ int i;
 //----------------------------------------
 
    clrscr();
-   print_screen("scr_delete.txt");
+   print_screen("scr_cancle.txt");
 
     x = 40;
     y = 6 ;
@@ -1537,7 +1380,7 @@ void sql_error(char *msg)
     printf("%s", msg);
     buf_len = sizeof (err_msg);
     sqlglm(err_msg, &buf_len, &msg_len);
-    printf("%.*s\n", msg_len, err_msg);
+    //printf("%.*s\n", msg_len, err_msg);
 
     gotoxy(x, y) ;   // 씅씅씅 ?씅?씅씅 ?씅 씅?씅 ??
     //getch();
