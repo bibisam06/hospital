@@ -207,7 +207,7 @@ void main()
     _putenv("NLS_LANG=American_America.KO16KSC5601");  //??씅??씅?
 
    /* Register sql_error() as the error handler. */
-    /* EXEC SQL WHENEVER SQLERROR DO sql_error("\7씅씅??"); */ 
+    /* EXEC SQL WHENEVER SQLERROR DO sql_error("\7씅씅??"); */
 
 
     db_connect();
@@ -217,7 +217,7 @@ void main()
         clrscr();
 
         print_screen("scr_main.txt") ;
-        gotoxy(49,15);
+        gotoxy(52,15);
 
         
         c = getchar() ;
@@ -332,9 +332,8 @@ struct { unsigned short len; unsigned char arr[20]; } pwd;
 
 
 
-    // connection씅 씅씅씅씅씅씅??씅??
     if ( Error_flag ==1 ){
-        //printf("Connect error: %s", sqlca.sqlerrm.sqlerrmc);
+        printf("Connect error: %s", sqlca.sqlerrm.sqlerrmc);
         exit(-1);
     }
 }
@@ -355,6 +354,7 @@ void reserve_tuple() {
     char res_pt[17];
     char res_doc[11];
     char res_dept[16];
+    char res_dept_date[16];
 
     int x, y;
 
@@ -382,16 +382,19 @@ void reserve_tuple() {
     gotoxy(x, y);
     gets(res_dept);
 
+    y = y + 2;
+    gotoxy(x, y);
+    gets(res_dept_date);
 
 
     sprintf(sqlstmt,
-        "INSERT INTO reservation (res_no, res_pt, res_doc, res_dept) "
-        "VALUES ('%s', '%s', '%s', '%s')",
+        "INSERT INTO reservation (res_no, res_pt, res_doc, res_dept, to_date(res_dept_date), res_status) "
+        "VALUES ('%s', '%s', '%s', '%s', 'pending')",
         res_no, res_pt, res_doc, res_dept);
 
     
 
-    /* SQL ?? ????? */
+    
     error_flag = simulate_sql_execution(sqlstmt);
 
     {
@@ -425,14 +428,14 @@ void reserve_tuple() {
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
     }
 
 
 
-    if (Error_flag == 0) {  // 씅씅씅씅씅 씅씅 ??씅?
+    if (Error_flag == 0) {  
         printf("\n");
-        printf(" 씅씅씅씅씅 ?씅?씅씅??  ??씅 ?씅씅 \n");
+        printf(" 투플이 정상적으로 입력되었습니다. \n");
         /* EXEC SQL COMMIT WORK ; */
 
         {
@@ -448,7 +451,7 @@ void reserve_tuple() {
             sqlstm.sqlety = (unsigned short)4352;
             sqlstm.occurs = (unsigned int)0;
             sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
-            if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+            if (sqlca.sqlcode < 0) sql_error("\nError Occured");
         }
 
 
@@ -456,7 +459,7 @@ void reserve_tuple() {
     }
     else {
         printf("\n");
-        printf(" ?씅씅 ?씅씅???씅?? ??씅 ?씅씅 \n");
+        printf("에러가 발생 하였습니다. \n");
         /* EXEC SQL ROLLBACK WORK ; */
 
         {
@@ -472,7 +475,7 @@ void reserve_tuple() {
             sqlstm.sqlety = (unsigned short)4352;
             sqlstm.occurs = (unsigned int)0;
             sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
-            if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+            if (sqlca.sqlcode < 0) sql_error("\nError Occured");
         }
 
 
@@ -530,11 +533,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
      //씅씅? sql씅씅씅
    sprintf(sqlstmt, "SELECT res_no, res_pt, res_doc, res_dept FROM reservation WHERE res_pt = '%s'", no_temp);
 
-   /* select 씅씅씅 씅씅?씅씅???씅??? 씅? */
-   //printf("sqlstmt:%s\n", sqlstmt);
-
-   /* EXEC SQL PREPARE S FROM :sqlstmt ; */ 
-
+ 
 {
    struct sqlexd sqlstm;
    sqlstm.sqlvsn = 13;
@@ -566,7 +565,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
    sqlstm.sqpadto = sqlstm.sqadto;
    sqlstm.sqptdso = sqlstm.sqtdso;
    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-   if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+   if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -595,7 +594,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
    sqlstm.occurs = (unsigned int  )0;
    sqlstm.sqcmod = (unsigned int )0;
    sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-   if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+   if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
  
@@ -659,12 +658,12 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
        
-        if(sqlca.sqlcode == 1403) {  // 씅??씅씅씅 씅씅씅 씅씅 씅?
+        if(sqlca.sqlcode == 1403) { 
             break;
         }
         res_pt.arr[res_pt.len] = '\0' ;
@@ -706,7 +705,7 @@ struct { unsigned short len; unsigned char arr[100]; } res_dept;
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -811,14 +810,15 @@ void insert_tuple()
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
 
     if( Error_flag == 0 ) {  // 씅씅씅씅씅 씅씅 ??씅?
         printf("\n");	
-        printf(" 씅씅씅씅씅 ?씅?씅씅??  ??씅 ?씅씅 \n" ) ;
+        printf(" 투플이 정상적으로 입력되었습니다. \n");
+
         /* EXEC SQL COMMIT WORK ; */ 
 
 {
@@ -834,7 +834,7 @@ void insert_tuple()
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0)sql_error("\nError Occured");
 }
 
 
@@ -842,7 +842,7 @@ void insert_tuple()
     }
     else {
         printf("\n");	
-        printf(" ?씅씅 ?씅씅???씅?? ??씅 ?씅씅 \n" ) ;
+        printf("에러가 발생 하였습니다. \n");
         /* EXEC SQL ROLLBACK WORK ; */ 
 
 {
@@ -858,7 +858,7 @@ void insert_tuple()
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -944,7 +944,7 @@ int i;
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0)sql_error("\nError Occured");
 }
 
 
@@ -971,7 +971,7 @@ int i;
     sqlstm.occurs = (unsigned int  )0;
     sqlstm.sqcmod = (unsigned int )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0)sql_error("\nError Occured");
 }
 
  
@@ -1030,7 +1030,7 @@ int i;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -1043,8 +1043,8 @@ int i;
         v_ename.arr[v_ename.len] = '\0';
         v_job.arr[v_job.len] = '\0';
 
-        printf("\n");
-        printf("                            씅씅?:%s    씅씅??%s   씅씅:%s \n", v_empno.arr, v_ename.arr, v_job.arr );
+    /*    printf("\n");
+        printf("                            씅씅?:%s    씅씅??%s   씅씅:%s \n", v_empno.arr, v_ename.arr, v_job.arr );*/
     }
     /* EXEC SQL CLOSE u_cursor; */ 
 
@@ -1061,14 +1061,14 @@ int i;
     sqlstm.sqlety = (unsigned short)4352;
     sqlstm.occurs = (unsigned int  )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
  
 
     /*  씅씅씅 씅씅씅 ?씅?씅씅 씅씅 ?씅?씅?씅 씅?씅?씅 */
     if ( sqlca.sqlerrd[2] == 0 ) {
-        printf("?씅?씅씅씅 씅씅??!!  ??씅 ?씅씅");
+        printf(" 에러가 발생하였습니다 종료하기위해 아무키를 눌러주세요. \n");
         getch();
         return ;
     }
@@ -1138,14 +1138,15 @@ int i;
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
 
     if( Error_flag == 0 ) {  // 씅씅씅씅씅 씅씅 ??씅?
         printf("\n");	
-        printf(" 씅씅?씅씅?? ??씅 ?씅씅 \n" ) ;
+        printf(" 투플이 정상적으로 입력되었습니다. \n");
+
         /* EXEC SQL COMMIT WORK ; */ 
 
 {
@@ -1161,7 +1162,7 @@ int i;
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -1169,7 +1170,7 @@ int i;
     }
     else {
         printf("\n");	
-        printf(" 씅씅씅씅 ??씅?? ??씅 ?씅씅 \n" ) ;
+        printf("에러가 발생 하였습니다. \n");
         /* EXEC SQL ROLLBACK WORK ; */ 
 
 {
@@ -1185,7 +1186,7 @@ int i;
         sqlstm.sqlety = (unsigned short)4352;
         sqlstm.occurs = (unsigned int  )0;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -1266,7 +1267,7 @@ int i;
     sqlstm.sqpadto = sqlstm.sqadto;
     sqlstm.sqptdso = sqlstm.sqtdso;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -1293,7 +1294,7 @@ int i;
     sqlstm.occurs = (unsigned int  )0;
     sqlstm.sqcmod = (unsigned int )0;
     sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-    if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+    if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
  
@@ -1344,7 +1345,7 @@ int i;
         sqlstm.sqpadto = sqlstm.sqadto;
         sqlstm.sqptdso = sqlstm.sqtdso;
         sqlcxt((void **)0, &sqlctx, &sqlstm, &sqlfpn);
-        if (sqlca.sqlcode < 0) sql_error("\7씅씅??");
+        if (sqlca.sqlcode < 0) sql_error("\nError Occured");
 }
 
 
@@ -1386,7 +1387,7 @@ int i;
     }
 
     // 씅씅 ????
-    printf("씅씅 씅얆씅?씅씅??씅?? (y/n) :");   
+    printf("투플을 삭제하시겠습니까? (y/n) :");   
 
     flag = (char *)getchar() ;
     while (getchar() != '\n');  // ?씅?씅 씅씅씅 ??씅씅
@@ -1436,7 +1437,7 @@ int i;
 
         if( Error_flag == 0 ) {  // 씅씅씅씅씅 씅씅 ??씅?
             printf("\n");	
-            printf(" 씅씅씅씅씅 씅씅?씅씅??  ??씅 ?씅씅 \n" ) ;
+            printf(" 투플이 정상적으로 입력되었습니다. \n");
             /* EXEC SQL COMMIT WORK ; */ 
 
 {
@@ -1460,7 +1461,8 @@ int i;
         }
         else {   //Error_falg == 1. 씅씅씅 ?씅?씅?
             printf("\n");	
-            printf(" ?씅씅 씅씅씅씅 ??씅?? ??씅 ?씅씅 \n" ) ;
+            printf("에러가 발생 하였습니다. \n");
+
             /* EXEC SQL ROLLBACK WORK ; */ 
 
 {
@@ -1485,9 +1487,8 @@ int i;
     }
     else {    // 씅씅 씅?
         printf("\n");	
-        printf("씅씅 씅?n");
-        printf("씅??씅?씅씅 : ??씅 ?씅씅. ");
-        getch();
+        printf("----------\n");
+        printf("---------\n ");
     }
 
 }
