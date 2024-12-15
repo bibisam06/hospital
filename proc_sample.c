@@ -282,8 +282,7 @@ struct { unsigned short len; unsigned char arr[20]; } pwd;
 
     Error_flag = 0 ;  
 
-   // ??ùùùù ùùùù ??ùùùùùù ?ùù??error ??ùù?ùùùù ùù. Error_flag=1ùù ??
-    /* EXEC SQL CONNECT :uid IDENTIFIED BY :pwd; */ 
+
 
 {
     struct sqlexd sqlstm;
@@ -360,7 +359,7 @@ void reserve_tuple() {
     int x, y;
 
     clrscr();
-    print_screen("scr_insert.txt");
+    print_screen("src_reserve.txt");
 
 
     x = 40;
@@ -368,52 +367,117 @@ void reserve_tuple() {
 
 
     gotoxy(x, y);
-    gets(pt_no);
+    gets(res_no);
 
     y = y + 2;
     gotoxy(x, y);
-    gets(pt_name);
+    gets(res_pt);
 
  
     y = y + 2;
     gotoxy(x, y);
-    gets(pt_birth);
+    gets(res_doc);
 
     y = y + 2;
     gotoxy(x, y);
-    gets(pt_tel);
+    gets(res_dept);
 
-    y = y + 2;
-    gotoxy(x, y);
-    gets(pt_gender);
 
 
     sprintf(sqlstmt,
-        "INSERT INTO reservation (pat_no, pat_name, pat_birth, pat_tel, pat_gender, pat_department, reservation_date) "
-        "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-        pt_no, pt_name, pt_birth, pt_tel, pt_gender, pt_department, pt_reservation_date);
+        "INSERT INTO reservation (res_no, res_pt, res_doc, res_dept) "
+        "VALUES ('%s', '%s', '%s', '%s')",
+        res_no, res_pt, res_doc, res_dept);
 
     
-    printf("SQL ?? ?: %s\n", sqlstmt);
 
     /* SQL ?? ????? */
     error_flag = simulate_sql_execution(sqlstmt);
 
-    /* --------------------------------------------------------------------------
-       SQL ?? ??? ?? ???? ??
-    -------------------------------------------------------------------------- */
-    if (error_flag == 0) {
-        // SQL ?? ??
-        printf("\n?? ??? ????? ???????.\n");
-    } else {
-        // SQL ?? ??
-        printf("\n?? ?? ??? ??????.\n");
+    {
+        struct sqlexd sqlstm;
+        sqlstm.sqlvsn = 13;
+        sqlstm.arrsiz = 4;
+        sqlstm.sqladtp = &sqladt;
+        sqlstm.sqltdsp = &sqltds;
+        sqlstm.stmt = "";
+        sqlstm.iters = (unsigned int)1;
+        sqlstm.offset = (unsigned int)127;
+        sqlstm.cud = sqlcud0;
+        sqlstm.sqlest = (unsigned char*)&sqlca;
+        sqlstm.sqlety = (unsigned short)4352;
+        sqlstm.occurs = (unsigned int)0;
+        sqlstm.sqhstv[0] = (void*)sqlstmt;
+        sqlstm.sqhstl[0] = (unsigned int)1000;
+        sqlstm.sqhsts[0] = (int)0;
+        sqlstm.sqindv[0] = (void*)0;
+        sqlstm.sqinds[0] = (int)0;
+        sqlstm.sqharm[0] = (unsigned int)0;
+        sqlstm.sqadto[0] = (unsigned short)0;
+        sqlstm.sqtdso[0] = (unsigned short)0;
+        sqlstm.sqphsv = sqlstm.sqhstv;
+        sqlstm.sqphsl = sqlstm.sqhstl;
+        sqlstm.sqphss = sqlstm.sqhsts;
+        sqlstm.sqpind = sqlstm.sqindv;
+        sqlstm.sqpins = sqlstm.sqinds;
+        sqlstm.sqparm = sqlstm.sqharm;
+        sqlstm.sqparc = sqlstm.sqharc;
+        sqlstm.sqpadto = sqlstm.sqadto;
+        sqlstm.sqptdso = sqlstm.sqtdso;
+        sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
+        if (sqlca.sqlcode < 0) sql_error("\7ùùùù??");
     }
 
-    /* --------------------------------------------------------------------------
-       ??? ?? ??
-    -------------------------------------------------------------------------- */
-    getch();
+
+
+    if (Error_flag == 0) {  // ùùùùùùùùùù ùùùù ??ùù?
+        printf("\n");
+        printf(" ùùùùùùùùùù ?ùù?ùùùù??  ??ùù ?ùùùù \n");
+        /* EXEC SQL COMMIT WORK ; */
+
+        {
+            struct sqlexd sqlstm;
+            sqlstm.sqlvsn = 13;
+            sqlstm.arrsiz = 4;
+            sqlstm.sqladtp = &sqladt;
+            sqlstm.sqltdsp = &sqltds;
+            sqlstm.iters = (unsigned int)1;
+            sqlstm.offset = (unsigned int)146;
+            sqlstm.cud = sqlcud0;
+            sqlstm.sqlest = (unsigned char*)&sqlca;
+            sqlstm.sqlety = (unsigned short)4352;
+            sqlstm.occurs = (unsigned int)0;
+            sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
+            if (sqlca.sqlcode < 0) sql_error("\7ùùùù??");
+        }
+
+
+        getch();
+    }
+    else {
+        printf("\n");
+        printf(" ?ùùùù ?ùùùù???ùù?? ??ùù ?ùùùù \n");
+        /* EXEC SQL ROLLBACK WORK ; */
+
+        {
+            struct sqlexd sqlstm;
+            sqlstm.sqlvsn = 13;
+            sqlstm.arrsiz = 4;
+            sqlstm.sqladtp = &sqladt;
+            sqlstm.sqltdsp = &sqltds;
+            sqlstm.iters = (unsigned int)1;
+            sqlstm.offset = (unsigned int)161;
+            sqlstm.cud = sqlcud0;
+            sqlstm.sqlest = (unsigned char*)&sqlca;
+            sqlstm.sqlety = (unsigned short)4352;
+            sqlstm.occurs = (unsigned int)0;
+            sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
+            if (sqlca.sqlcode < 0) sql_error("\7ùùùù??");
+        }
+
+
+        getch();
+    }
 }
 
 /* --------------------------------------------------------------------------

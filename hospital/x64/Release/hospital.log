@@ -1,24 +1,27 @@
 ﻿  proc_sample.c
 C:\Users\heimi\바탕 화면\hospital\proc_sample.c(279,16): warning C4267: '=': 'size_t'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\heimi\바탕 화면\hospital\proc_sample.c(281,15): warning C4267: '=': 'size_t'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(371,5): warning C4013: 'gets'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(400,18): warning C4013: 'simulate_sql_execution'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(355,10): warning C4101: 'res_no' :참조되지 않은 지역 변수입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(358,10): warning C4101: 'res_dept' :참조되지 않은 지역 변수입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(356,10): warning C4101: 'res_pt' :참조되지 않은 지역 변수입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(357,10): warning C4101: 'res_doc' :참조되지 않은 지역 변수입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(453,9): warning C4101: 'name_temp' :참조되지 않은 지역 변수입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(832,5): warning C4101: 'i' :참조되지 않은 지역 변수입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1327,12): warning C4312: '형식 캐스트': 'int'에서 더 큰 'char *'(으)로의 변환입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1327,10): warning C4047: '=': 'char'의 간접 참조 수준이 'char *'과(와) 다릅니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1154,5): warning C4101: 'i' :참조되지 않은 지역 변수입니다.
-C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1475,12): warning C4477: 'printf' : 서식 문자열 '%.*s'에 'int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'size_t'입니다.
-      C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1475,12):
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(370,5): warning C4013: 'gets'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(395,18): warning C4013: 'simulate_sql_execution'이(가) 정의되지 않았습니다. extern은 int형을 반환하는 것으로 간주합니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(346,10): warning C4101: 'pt_tel' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(347,10): warning C4101: 'pt_gender' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(344,10): warning C4101: 'pt_name' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(349,10): warning C4101: 'pt_reservation_date' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(343,10): warning C4101: 'pt_no' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(345,10): warning C4101: 'pt_birth' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(348,10): warning C4101: 'pt_department' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(517,9): warning C4101: 'name_temp' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(896,5): warning C4101: 'i' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1391,12): warning C4312: '형식 캐스트': 'int'에서 더 큰 'char *'(으)로의 변환입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1391,10): warning C4047: '=': 'char'의 간접 참조 수준이 'char *'과(와) 다릅니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1218,5): warning C4101: 'i' :참조되지 않은 지역 변수입니다.
+C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1539,12): warning C4477: 'printf' : 서식 문자열 '%.*s'에 'int' 형식의 인수가 필요하지만 variadic 인수 1의 형식이 'size_t'입니다.
+      C:\Users\heimi\바탕 화면\hospital\proc_sample.c(1539,12):
       이 인수는 전체 자릿수로 사용됩니다.
   
   코드를 생성하고 있습니다.
   3 of 19 functions (15.8%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    8 functions had inline decision re-evaluated but remain unchanged
+    4 functions had inline decision re-evaluated but remain unchanged
   코드를 생성했습니다.
   hospital.vcxproj -> C:\Users\heimi\바탕 화면\hospital\x64\Release\hospital.exe
