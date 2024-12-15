@@ -195,6 +195,7 @@ void select_tuple();
 void insert_tuple();
 void delete_tuple();
 void update_tuple();
+void reserve_tuple();
 //void reserve_tuple();
 void sql_error();
 
@@ -231,8 +232,9 @@ void main()
                          break;
             case '4' : update_tuple();
                          break;
-          /*  case '5': reserve_tuple();
-                break;*/
+          case '5': reserve_tuple();
+                break;
+         // case '6': break;
             default : break ;
 	
         }		
@@ -337,7 +339,167 @@ struct { unsigned short len; unsigned char arr[20]; } pwd;
         exit(-1);
     }
 }
+void reserve_tuple() {
+    /* --------------------------------------------------------------------------
+   Retrieve the current maximum employee number
+-------------------------------------------------------------------------- */
+/* EXEC SQL BEGIN DECLARE SECTION; */
 
+   /* varchar v_empno[100]; */
+    struct { unsigned short len; unsigned char arr[100]; } res_pt;
+
+    /* varchar v_ename[100]; */
+    struct { unsigned short len; unsigned char arr[100]; } res_doc;
+
+    /* varchar v_job[100]; */
+    struct { unsigned short len; unsigned char arr[100]; } res_dept;
+    char sqlstmt[1000];
+    /* EXEC SQL END DECLARE SECTION; */
+
+
+    char pt_no[5];
+    char pt_name[17];
+    char pt_birth[11];
+    char pt_tel[16];
+    char pt_gender[5];
+
+    int x, y;
+
+    clrscr();
+    print_screen("scr_add_reservation.txt");
+
+    /* 데이터 입력 */
+    x = 40;
+    y = 6;
+
+    /* 사원번호 입력 */
+    gotoxy(x, y);
+    gets(pt_no);
+
+    /* 사원 이름 입력 */
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_name);
+
+    /* 직급 입력 */
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_birth);
+
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_tel);
+
+    y = y + 2;
+    gotoxy(x, y);
+    gets(pt_gender);
+
+    /* 실행 명령 추가 */
+    /* EXEC SQL EXECUTE IMMEDIATE :sqlstmt; */
+    printf("Executing SQL: %s\n", sqlstmt); // 디버깅용으로 출력
+
+
+    sprintf(sqlstmt, "insert into patient(pat_no, pat_name, pat_birth, pat_tel, pat_gender) values ( %s, '%s', '%s', '%s', '%s')", pt_no, pt_name, pt_birth, pt_tel, pt_gender);
+
+    /* 실행 명령 추가 */
+   /* EXEC SQL EXECUTE IMMEDIATE :sqlstmt; */
+    printf("Executing SQL: %s\n", sqlstmt); // 디버깅용으로 출력
+
+    /* 화면 전환 */
+    clrscr();
+    print_screen("scr_add_reservation.txt");
+
+    /* insert 문 실행 */
+    Error_flag = 0;
+
+    // 아래 문장 수행 중에 에러가 발생하면 error 처리 루틴으로 감. Error_flag=1로 바뀜 
+     /* EXEC SQL EXECUTE IMMEDIATE :sqlstmt ; */
+
+    {
+        struct sqlexd sqlstm;
+        sqlstm.sqlvsn = 13;
+        sqlstm.arrsiz = 4;
+        sqlstm.sqladtp = &sqladt;
+        sqlstm.sqltdsp = &sqltds;
+        sqlstm.stmt = "";
+        sqlstm.iters = (unsigned int)1;
+        sqlstm.offset = (unsigned int)127;
+        sqlstm.cud = sqlcud0;
+        sqlstm.sqlest = (unsigned char*)&sqlca;
+        sqlstm.sqlety = (unsigned short)4352;
+        sqlstm.occurs = (unsigned int)0;
+        sqlstm.sqhstv[0] = (void*)sqlstmt;
+        sqlstm.sqhstl[0] = (unsigned int)1000;
+        sqlstm.sqhsts[0] = (int)0;
+        sqlstm.sqindv[0] = (void*)0;
+        sqlstm.sqinds[0] = (int)0;
+        sqlstm.sqharm[0] = (unsigned int)0;
+        sqlstm.sqadto[0] = (unsigned short)0;
+        sqlstm.sqtdso[0] = (unsigned short)0;
+        sqlstm.sqphsv = sqlstm.sqhstv;
+        sqlstm.sqphsl = sqlstm.sqhstl;
+        sqlstm.sqphss = sqlstm.sqhsts;
+        sqlstm.sqpind = sqlstm.sqindv;
+        sqlstm.sqpins = sqlstm.sqinds;
+        sqlstm.sqparm = sqlstm.sqharm;
+        sqlstm.sqparc = sqlstm.sqharc;
+        sqlstm.sqpadto = sqlstm.sqadto;
+        sqlstm.sqptdso = sqlstm.sqtdso;
+        sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
+        if (sqlca.sqlcode < 0) sql_error("\7에러발생:");
+    }
+
+
+
+    if (Error_flag == 0) {  // 정상적으로 수행 되는 경우
+        printf("\n");
+        printf(" 정상적으로 추가되었습니다.  아무키나 치세요 \n");
+        /* EXEC SQL COMMIT WORK ; */
+
+        {
+            struct sqlexd sqlstm;
+            sqlstm.sqlvsn = 13;
+            sqlstm.arrsiz = 4;
+            sqlstm.sqladtp = &sqladt;
+            sqlstm.sqltdsp = &sqltds;
+            sqlstm.iters = (unsigned int)1;
+            sqlstm.offset = (unsigned int)146;
+            sqlstm.cud = sqlcud0;
+            sqlstm.sqlest = (unsigned char*)&sqlca;
+            sqlstm.sqlety = (unsigned short)4352;
+            sqlstm.occurs = (unsigned int)0;
+            sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
+            if (sqlca.sqlcode < 0) sql_error("\7에러발생:");
+        }
+
+
+        getch();
+    }
+    else {
+        printf("\n");
+        printf(" 튜플이 추가되지 않았습니다. 아무키나 치세요 \n");
+        /* EXEC SQL ROLLBACK WORK ; */
+
+        {
+            struct sqlexd sqlstm;
+            sqlstm.sqlvsn = 13;
+            sqlstm.arrsiz = 4;
+            sqlstm.sqladtp = &sqladt;
+            sqlstm.sqltdsp = &sqltds;
+            sqlstm.iters = (unsigned int)1;
+            sqlstm.offset = (unsigned int)161;
+            sqlstm.cud = sqlcud0;
+            sqlstm.sqlest = (unsigned char*)&sqlca;
+            sqlstm.sqlety = (unsigned short)4352;
+            sqlstm.occurs = (unsigned int)0;
+            sqlcxt((void**)0, &sqlctx, &sqlstm, &sqlfpn);
+            if (sqlca.sqlcode < 0) sql_error("\7에러발생:");
+        }
+
+
+        getch();
+    }
+}
 
 #define PAGE_NUM 5
 void select_tuple()
